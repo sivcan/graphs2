@@ -1,0 +1,300 @@
+{% load static from staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>GraphicDen Graph</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<style>
+	.axis path,
+.axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
+.axis text {
+	font-family: sans-serif;
+	font-size: 11px;
+}
+
+rect {
+	-moz-transition: all 0.3s;
+	-webkit-transition: all 0.3s;
+	-o-transition: all 0.3s;
+	transition: all 0.3s;
+	stroke:white;
+	/*opacity:0.7;
+	/*stroke-width:1;*/
+}
+rect:hover{
+	fill: orange;
+}
+.pos{
+	position: absolute;
+	margin-left: 100px;
+}
+.navbar {
+	font: 20px Montserrat, sans-serif;
+	line-height: 1.8;
+	color: #f5f6f7;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	border: 0;
+	border-radius: 0;
+	margin-bottom: 0;
+	font-size: 12px;
+	letter-spacing: 5px;
+}
+.navbar-nav  li a:hover {
+	color: #1abc9c !important;
+}
+
+body{
+	background-image:url('{% static 'backdrop2.jpg' %}');
+	background-size:cover;
+	background-repeat: no-repeat;
+	color:white;
+	font-family:Monsterrat;
+}
+
+</style>
+</head>
+<body>
+	<nav class="navbar navbar-default">
+	  <div class="container">
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <a class="navbar-brand" href="#"></a>
+	    </div>
+	    <div class="collapse navbar-collapse" id="myNavbar">
+	      <ul class="nav navbar-nav navbar-right">
+	        <li><a href="/index/">HOME</a></li>
+	        <li><a href="/addgraph/">UPLOAD FORM</a></li>
+	        <li><a href="/convert/">GRAPH</a></li>
+	        <li><a href="/login/">LOGIN/SIGN UP</a></li>
+			<li><a href="/number">CHOOSE</a></li>
+	      </ul>
+	    </div>
+	  </div>
+	</nav>
+
+</body>
+<br>
+<br>
+<br>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+var w = 1000;
+var h = 550;
+
+
+var dataset={{ p|safe }};
+
+
+var xScale = d3.scale.ordinal()
+				.domain(d3.range(dataset.length))
+				.rangeRoundBands([0, w], 0.05);
+
+var yScale = d3.scale.linear()
+				.domain([0, d3.max(dataset, function(d) {return d.{{ y_axis }};})])
+				.range([0, h]);
+
+var {{ x_axis }} = function(d) {
+	return d.{{ x_axis }};
+};
+
+//Create SVG element
+var svg = d3.select("body")
+			.attr("align","center")
+			.append("svg")
+			.attr("width", w)
+			.attr("height", h);
+
+
+//Create bars
+svg.selectAll("rect")
+   .data(dataset, {{ x_axis }})
+   .enter()
+   .append("rect")
+   .attr("x", function(d, i) {
+		return xScale(i);
+   })
+   .attr("y", function(d) {
+		return h - yScale(d.{{ y_axis }});
+   })
+   .attr("width", xScale.rangeBand())
+   .attr("height", function(d) {
+		return yScale(d.{{ y_axis }});
+   })
+   .attr("fill", function(d) {
+		//return "rgb(0,0, " + (d.{{ y_axis }} * 10) + ")";
+		return "transparent"
+
+   })
+
+	//Tooltip
+	.on("mouseover", function(d) {
+		//Get this bar's x/y {{ y_axis }}s, then augment for the tooltip
+		var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.rangeBand() / 2;
+		var yPosition = parseFloat(d3.select(this).attr("y")) + 14;
+
+		//Update Tooltip Position & {{ y_axis }}
+		d3.select("#tooltip")
+			.style("left", xPosition + "px")
+			.style("top", yPosition + "px")
+			.select("#{{ y_axis }}")
+			.text(d.{{ y_axis }});
+		d3.select("#tooltip").classed("hidden", false)
+	})
+	.on("mouseout", function() {
+		//Remove the tooltip
+		d3.select("#tooltip").classed("hidden", true);
+	})	;
+
+//Create labels
+svg.selectAll("text")
+   .data(dataset, {{ x_axis }})
+   .enter()
+   .append("text")
+   .text(function(d) {
+		return d.{{ y_axis }};
+   })
+   .attr("text-anchor", "middle")
+   .attr("x", function(d, i) {
+		return xScale(i) + xScale.rangeBand() / 2;
+   })
+   .attr("y", function(d) {
+		return h - yScale(d.{{ y_axis }}) + 14;
+   })
+   .attr("font-family", "sans-serif")
+   .attr("font-size", "11px")
+   .attr("fill", "white");
+
+var sortOrder = false;
+var sortBars = function () {
+    sortOrder = !sortOrder;
+
+    sortItems = function (a, b) {
+        if (sortOrder) {
+            return a.{{ y_axis }} - b.{{ y_axis }};
+        }
+        return b.{{ y_axis }} - a.{{ y_axis }};
+    };
+
+    svg.selectAll("rect")
+        .sort(sortItems)
+        .transition()
+        .delay(function (d, i) {
+        return i * 50;
+    })
+        .duration(1000)
+        .attr("x", function (d, i) {
+        return xScale(i);
+    });
+
+    svg.selectAll('text')
+        .sort(sortItems)
+        .transition()
+        .delay(function (d, i) {
+        return i * 50;
+    })
+        .duration(1000)
+        .text(function (d) {
+        return d.{{ y_axis }};
+    })
+        .attr("text-anchor", "middle")
+        .attr("x", function (d, i) {
+        return xScale(i) + xScale.rangeBand() / 2;
+    })
+        .attr("y", function (d) {
+        return h - yScale(d.{{ y_axis }}) + 14;
+    });
+};
+// Add the onclick callback to the button
+d3.select("#sort").on("click", sortBars);
+d3.select("#reset").on("click", reset);
+function randomSort() {
+
+
+	svg.selectAll("rect")
+        .sort(sortItems)
+        .transition()
+        .delay(function (d, i) {
+        return i * 50;
+    })
+        .duration(1000)
+        .attr("x", function (d, i) {
+        return xScale(i);
+    });
+
+    svg.selectAll('text')
+        .sort(sortItems)
+        .transition()
+        .delay(function (d, i) {
+        return i * 50;
+    })
+        .duration(1000)
+        .text(function (d) {
+        return d.{{ y_axis }};
+    })
+        .attr("text-anchor", "middle")
+        .attr("x", function (d, i) {
+        return xScale(i) + xScale.rangeBand() / 2;
+    })
+        .attr("y", function (d) {
+        return h - yScale(d.{{ y_axis }}) + 14;
+    });
+}
+function reset() {
+	svg.selectAll("rect")
+		.sort(function(a, b){
+			return a.{{ x_axis }} - b.{{ x_axis }};
+		})
+		.transition()
+        .delay(function (d, i) {
+        return i * 50;
+		})
+        .duration(1000)
+        .attr("x", function (d, i) {
+        return xScale(i);
+		});
+
+	svg.selectAll('text')
+        .sort(function(a, b){
+			return a.{{ x_axis }} - b.{{ x_axis }};
+		})
+        .transition()
+        .delay(function (d, i) {
+        return i * 50;
+    })
+        .duration(1000)
+        .text(function (d) {
+        return d.{{ y_axis }};
+    })
+        .attr("text-anchor", "middle")
+        .attr("x", function (d, i) {
+        return xScale(i) + xScale.rangeBand() / 2;
+    })
+        .attr("y", function (d) {
+        return h - yScale(d.{{ y_axis }}) + 14;
+    });
+};
+
+</script>
+
+<br><br><br><br><br>
+	<button id="sort" onclick="sortBars()"><font color="black" face="sans-serif"><h4>SORT</h4></font></button>&nbsp;&nbsp;&nbsp;
+    <button id="reset" onclick="reset()"><font color="black" face="sans-serif"><h4>RESET</h4></font></button>
+
+</body>
+</html>

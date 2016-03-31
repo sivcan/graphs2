@@ -1,0 +1,98 @@
+{% load static from staticfiles %}
+{% load bootstrap3 %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>GraphicDen Graph Number</title>
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/examples/justified-nav/justified-nav.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+</head>
+<style>
+.edit{
+    font: 17px Montserrat, sans-serif;
+    background-image:url('{% static 'piedrop2.jpg' %}');
+    background-size:cover;
+}
+.btn{
+    font-size: 0.9em;
+}
+.navbar {
+    clear:both;
+    font: 20px Montserrat, sans-serif;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border: 0;
+    border-radius: 0;
+    margin: -20px auto 0 auto;
+    font-size: 12px;
+    letter-spacing: 5px;
+}
+.navbar-nav  li a:hover {
+    color: #1abc9c !important;
+}
+
+</style>
+<div class="edit">
+<body>
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"></a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/index/">HOME</a></li>
+            <li><a href="/addgraph/">UPLOAD FORM</a></li>
+            <li><a href="/convert/">GRAPH</a></li>
+            <li><a href="/login/">LOGIN/SIGN UP</a></li>
+            <li><a href="/number">CHOOSE</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
+    <h3>User Form : <h3>
+    <br><br>
+    <form role="form" method="post">
+       {% csrf_token %}
+       {% bootstrap_form form %}
+       <br>
+      <input type='hidden' name='csrfmiddlewaretoken' value='{{csrf_token}}'>
+      <button type="submit" class="btn btn-default">Submit</button>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br>
+      <br><br><br>
+
+
+    </form>
+
+</body>
+</div>
+</html>

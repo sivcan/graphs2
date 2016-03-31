@@ -1,0 +1,171 @@
+{% load static from staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>GraphicDen Graph</title>
+    <meta charset="utf-8">
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/examples/justified-nav/justified-nav.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <style>
+        body{
+            background-image:url('{% static 'backdrop2.jpg' %}');
+            background-size:cover;
+            background-repeat: no-repeat;
+            color:white;
+            font-family:Monsterrat;
+        }
+
+        .axis path {
+            fill: #22264b;
+            /*stroke: #AAAAAA;*/
+            stroke-width:3;
+            shape-rendering: crispEdges;
+            color:white;
+        }
+        .axis text {
+            font-family: Monsterrat;
+            font-size: 15px;
+            color:white;
+            stroke:white;
+        }
+        .navbar {
+            clear:both;
+            font: 20px Montserrat, sans-serif;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            border: 0;
+            border-radius: 0;
+            margin: -20px auto 0 auto;
+            font-size: 12px;
+            letter-spacing: 5px;
+        }
+        .navbar-nav  li a:hover {
+            color: #1abc9c !important;
+        }
+
+        .yolo {
+            font-family:Lato;
+            position: absolute;
+            left:380px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"></a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/index/">HOME</a></li>
+            <li><a href="/addgraph/">UPLOAD FORM</a></li>
+            <li><a href="/convert/">GRAPH</a></li>
+            <li><a href="/login/">LOGIN/SIGN UP</a></li>
+            <li><a href="/number">CHOOSE</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+
+        <div class="jumbotron">
+
+            <svg id="visualisation" width="1000" height="500"></svg>
+            <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+            <script>
+                function InitChart() {
+
+                    var data = {{ p|safe }};
+
+                    var vis = d3.select("#visualisation").attr("align","center"),
+                        WIDTH = 1000,
+                        HEIGHT = 500,
+                        MARGINS = {
+                            top: 20,
+                            right: 20,
+                            bottom: 20,
+                            left: 50
+                        },
+                        //41,114
+                        xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([{{ domain_x_min }}, {{ domain_x_max }}]),
+                        //153,478
+                        yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([{{ domain_y_min }}, {{ domain_y_max }}]),
+
+                        xAxis = d3.svg.axis()
+                        .scale(xScale),
+
+                        yAxis = d3.svg.axis()
+                        .scale(yScale)
+                        .orient("left");
+
+
+
+
+                    vis.append("svg:g")
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+                        .call(xAxis);
+
+                    vis.append("svg:g")
+                        .attr("class", "y axis")
+                        .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+                        .call(yAxis);
+
+                    var lineGen = d3.svg.line()
+                        .x(function(d) {
+                            return xScale(d.{{ x_axis }});
+                        })
+                        .y(function(d) {
+                            return yScale(d.{{ y_axis }});
+                        })
+                        .interpolate("basis");
+
+                    vis.append('svg:path')
+                        .attr('d', lineGen(data))
+                        .attr('stroke', 'white')
+                        .attr('stroke-width', 2)
+                        .attr('fill', 'transparent');
+
+                }
+                InitChart();
+            </script>
+        </div>
+
+    </div>
+    <div class="container">
+    <div class="yolo" id="up">
+    <h3>PLOT :<h3>
+        <h2>X-axis : {{ name_x }}</h2>
+        <h2>Y-axis : {{ name_y }}</h2><br>
+
+    </div>
+</div>
+<!-- <input type="button" onclick="printer()" value={{ namez }}></input> -->
+
+</body>
+
+<script>
+    var x=document.getElementById("up");
+    x.innerHTML=x.innerHTML.toUpperCase();
+
+    function printer()
+    {
+        window.print();
+    }
+</script>
+</html>
